@@ -1,0 +1,35 @@
+:root {
+  --paper: #F3E9D2;
+  --ink: #2B2A26;
+  --forest: #2F5D45;
+  --tomato: #E4572E;
+  --mustard: #E9B44C;
+  --heading-font: "Fraunces", serif;
+  --body-font: "Karla", sans-serif;
+  --label-font: "Special Elite", monospace;
+}
+* {box-sizing: border-box; margin: 0;}
+
+body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body-font);
+    line-height: 1.5;
+}
+
+h1, h2, h3 { font-family:var(--heading-font);}
+
+h1{
+    font-size:clamp(2.5rem,6vw,5rem);
+    font-weight:700;
+}
+
+h2{
+    font-size:2rem;
+    font-weight:700;
+}
+
+h3{
+    font-size:1.4rem;
+    font-weight:700;
+}
