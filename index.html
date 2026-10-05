@@ -4,31 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wayfound</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Karla:ital,wght@0,200..800;1,200..800&family=Special+Elite&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
   </head>
 
   <body>
     <header>
-        <a href="index.html">Wayfound</a>
+        <p>Wayfound</p>
         <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="library.html">Library</a></li>
-                <li><a href="journal.html">journal</a></li>
-            </ul>
+            <button data-view="home">Home</button>
+            <button data-view="library">Library</button>
+            <button data-view="logbook">Logbook</button>
         </nav>
     </header>
-    <main>
-        <section>
-            <h1>Turn everyday life into side quests.</h1>
-            <p>Discover small real-world challenges for exploration, creativity, connection, personal growth, and spending less time on screens.</p>
-            <button id="random-btn">Surprise me!</button>
-        </section>
-    </main>
 
-
-
-
+    <section id="home"></section>
+    <section id="library"></section>
+    <section id="logbook"></section>
 
   </body>
-</html>
+
+
+
+
+  </html>
