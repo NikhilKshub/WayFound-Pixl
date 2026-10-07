@@ -1,6 +1,9 @@
 const sections = document.querySelectorAll("section");
 const navButtons = document.querySelectorAll("nav button");
 const todaysQuests = document.querySelector("#todays-quests");
+const today=new Date();
+const dayNumber = today.getFullYear() * 400 + today.getMonth() *31 + today.getDate();
+const start=(dayNumber * 3) % allQuests.length;
 
 function showView(name) {
   sections.forEach(function(section) {
@@ -27,9 +30,10 @@ function makeCard(quest) {
   `;
 }
 
-allQuests.slice(0, 3).forEach(function(quest) {
-  todaysQuests.innerHTML += makeCard(quest);
-});
+for (let i=0; i<3; i++){
+  const index = (start+i) % allQuests.length;
+  todaysQuests.innerHTML += makeCard(allQuests[index]);
+}
 
 navButtons.forEach(function(button) {
   button.addEventListener("click", function() {
