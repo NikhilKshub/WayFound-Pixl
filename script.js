@@ -13,12 +13,16 @@ function showView(name) {
 }
 
 function makeCard(quest) {
+  const filled = "●".repeat(quest.difficulty);
+  const empty = "○".repeat(5 - quest.difficulty);
+
   return `
     <div class="card" data-id="${quest.id}">
+      <span class="badge">${quest.emoji}</span>
       <h3>${quest.title}</h3>
       <p>${quest.description}</p>
-      <span>${quest.duration}</span>
-      <span>${quest.difficulty}</span>
+      <span class="duration">${quest.duration}</span>
+      <span class="difficulty">${filled}${empty}</span>
     </div>
   `;
 }
