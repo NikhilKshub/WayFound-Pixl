@@ -9,7 +9,9 @@ const sheetContent = document.querySelector("#sheet-content");
 const closeSheet = document.querySelector("#close-sheet");
 const logList = document.querySelector("#log-list");
 const emptyMessage = document.querySelector("#empty-message");
+const surpriseBtn = document.querySelector("#surprise-btn");
 const progress = JSON.parse(localStorage.getItem("wayfound-progress")) || {};
+
 
 
 function saveProgress(){
@@ -193,9 +195,26 @@ function shrinkPhoto(file, whenDone){
   reader.readAsDataURL(file);
 }
 
+function openSheet(quest){
+  sheetContent.innerHTML = makeSheet(quest);
+  questSheet.showModal();
+}
 
+function pickRandomQuest(){
+  const fresh = allQuests.filter(function(quest){
+    return getStatus(quest.id) === "new";
+  });
+  let list = fresh;
+  if(fresh.length === 0){
+    list = allQuests;
+  }
+  const index = Math.floor(Math.random() * list.length);
+  return list[index];
+}
 
-
+surpriseBtn.addEventListener("click",function(){
+  openSheet(pickRandomQuest());
+});
 
 
 
@@ -210,8 +229,7 @@ todaysQuests.addEventListener("click",function(event){
   if(!card) return;
   const id = card.dataset.id;
   const quest = findQuest(id);
-  sheetContent.innerHTML = makeSheet(quest);
-  questSheet.showModal();
+  openSheet(quest);
 })
 
 closeSheet.addEventListener("click",function(){
