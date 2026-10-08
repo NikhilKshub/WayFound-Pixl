@@ -13,6 +13,7 @@ const surpriseBtn = document.querySelector("#surprise-btn");
 const packList = document.querySelector("#pack-list");
 const packQuests = document.querySelector("#pack-quests");
 let openPackId = "";
+const packHeader = document.querySelector("#pack-header");
 const progress = JSON.parse(localStorage.getItem("wayfound-progress")) || {};
 
 
@@ -35,6 +36,12 @@ function getStatus(id){
 function findQuest(id){
   return allQuests.find(function(quest){
     return quest.id === id;
+  })
+}
+
+function findPack(id){
+  return packs.find(function(pack){
+    return pack.id === id;
   })
 }
 
@@ -242,7 +249,6 @@ function makePack(pack){
     <div class="pack${selected}" data-id="${pack.id}">
       <span class="badge">${pack.coverEmoji}</span>
       <h3>${pack.name}</h3>
-      <p>${pack.description}</p>
       <span>${done} of ${quests.length} done</span>
     </div>
   `;
@@ -251,9 +257,15 @@ function makePack(pack){
 function showPackQuests(){
   packQuests.innerHTML ="";
   if(openPackId === ""){
+    packHeader.innerHTML ="";
     packQuests.innerHTML = "<p>Pick a pack to see its quests</p>";
     return;
   }
+  const pack = findPack(openPackId);
+  packHeader.innerHTML = `
+    <h3>${pack.name}</h3>
+    <p>${pack.description}</p>
+  `;
   questsInPack(openPackId).forEach(function(quest){
     packQuests.innerHTML += makeCard(quest);
   });
