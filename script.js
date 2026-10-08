@@ -10,10 +10,14 @@ const closeSheet = document.querySelector("#close-sheet");
 const logList = document.querySelector("#log-list");
 const emptyMessage = document.querySelector("#empty-message");
 const surpriseBtn = document.querySelector("#surprise-btn");
+const packlist = document.querySelector("#pack-list");
+const packQuests = document.querySelector("#pack-quests");
+let openPackId = "";
 const progress = JSON.parse(localStorage.getItem("wayfound-progress")) || {};
 
 
 
+// functions 
 function saveProgress(){
   try{
     localStorage.setItem("wayfound-progress", JSON.stringify(progress));
@@ -212,17 +216,52 @@ function pickRandomQuest(){
   return list[index];
 }
 
+
+function questsInPack(packId){
+  return allQuests.filter(function(quest){
+    return quest.pack === packId;
+  });
+}
+
+function makePack(pack){
+  const quests = questsInPack(pack.id);
+  const done = quests.filter(function(quests){
+    return getStatus(quest.id) === "done";
+  }).length;
+  let selected = "";
+  if(pack.id === openPackId){
+    selected = " selected";
+  }
+  return `
+    <div class="pack${selected}" data-id="${pack.id}">
+      <span class="badge">${pack.emoji}</span>
+      <h3>${pack.name}</h3>
+      <p>${pack.description}</p>
+      <span>${done} of ${quests.length} done</span>
+    </div>
+  `;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Listeners 
+
 surpriseBtn.addEventListener("click",function(){
   openSheet(pickRandomQuest());
 });
-
-
-
-
-
-
-
-
 
 todaysQuests.addEventListener("click",function(event){
   const card = event.target.closest(".card");
