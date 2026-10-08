@@ -12,25 +12,12 @@ const emptyMessage = document.querySelector("#empty-message");
 const progress = JSON.parse(localStorage.getItem("wayfound-progress")) || {};
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function saveProgress(){
-  localStorage.setItem("wayfound-progress",JSON.stringify(progress));
+  try{
+    localStorage.setItem("wayfound-progress", JSON.stringify(progress));
+  } catch (error){
+    alert("The photo is too big to save.")
+  }
 }
 
 function getStatus(id){
@@ -39,13 +26,12 @@ function getStatus(id){
   }
   return progress[id].status;
 }
+
 function findQuest(id){
   return allQuests.find(function(quest){
     return quest.id === id;
   })
 }
-
-
 
 function showView(name) {
   sections.forEach(function(section) {
@@ -114,6 +100,8 @@ function makeSheet(quest){
   if(status ==="active"){
     buttons =`
       <textarea placeholder="How did it really go? Optional."></textarea>
+      <label>Photo is optional</label>
+      <input type="file" accept="image/*"
       <button data-action="complete" data-id="${quest.id}">Mark as done</button>
     `;
   }
@@ -139,6 +127,10 @@ function makeLogEntry(id){
   if(record.note !== ""){
     note=`<p>${record.note}</p>`;
   }
+  let photo="";
+  if(record.photo !== ""){
+    photo=`<img src="${record.photo}" alt="Quest photo">`;
+  }
   return `
     <div class="card">
       <span class="badge">${quest.emoji}</span>
@@ -146,6 +138,7 @@ function makeLogEntry(id){
       <p>${new Date(record.doneAt).toDateString()}</p>
       <p>${quest.description}</p>
       ${note}
+      ${photo}
     </div>
   `;
 }
@@ -169,7 +162,33 @@ function showLogbook(){
 }
 
 
+function finishQuest(id,note,photo){
+  progress[id]={status:"done",doneAt:Date.now(),note:note,photo:photo};
+  saveProgress();
+  showLogbook();
+  const quest = findQuest(id);
+  sheetContent.innerHTML = makeSheet(quest);
+  showTodaysQuests();
+}
 
+function shrinkPhoto(file, whenDone){
+  const reader= new FileReader();
+  reader.onload = function(){
+    const img = new Image();
+    img.src = reader.result;
+    img.onload = function(){
+      const scale = Math.min(1, 600 / img.width);
+      const width = img.width * scale;
+      const height = img.height * scale;
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+      whenDone(canvas.toDataURL("image.jpeg", 0.7));
+    };
+  };
+  reader.readAsDataURL(file);
+}
 
 
 
@@ -205,13 +224,16 @@ sheetContent.addEventListener("click",function(event){
   }
   if(action === "complete"){
     const note = sheetContent.querySelector("textarea").value;
-    progress[id]={status:"done",doneAt:Date.now(),note:note};
+    const input = sheetContent.querySelector("input");
+    const file = input.files[0];
+    if(!file){
+      finishQuest(id, note, "");
+      return;
+    }
+    shrinkPhoto(file, function(photo){
+      finishQuest(id, note, photo);
+    });
   }
-  saveProgress();
-  showLogbook();
-  const quest = findQuest(id);
-  sheetContent.innerHTML = makeSheet(quest);
-  showTodaysQuests();
 });
 
 
