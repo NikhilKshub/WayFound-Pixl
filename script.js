@@ -7,7 +7,27 @@ const start=(dayNumber * 3) % allQuests.length;
 const questSheet = document.querySelector("#quest-sheet");
 const sheetContent = document.querySelector("#sheet-content");
 const closeSheet = document.querySelector("#close-sheet");
+const logList = document.querySelector("#log-list");
+const emptyMessage = document.querySelector("#empty-message");
 const progress = JSON.parse(localStorage.getItem("wayfound-progress")) || {};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function saveProgress(){
   localStorage.setItem("wayfound-progress",JSON.stringify(progress));
@@ -92,11 +112,14 @@ function makeSheet(quest){
     buttons = `<button data-action="accept" data-id="${quest.id}">Accept quest</button>`;
   }
   if(status ==="active"){
-    buttons = `<button data-action="complete" data-id="${quest.id}">Mark as done</button>`;
+    buttons =`
+      <textarea placeholder="How did it really go? Optional."></textarea>
+      <button data-action="complete" data-id="${quest.id}">Mark as done</button>
+    `;
+  }
   if(status ==="done"){
     buttons = `<p>You finished it.</p>`;
   } 
-}
   return `
     <div class="badge">${quest.emoji}</div>
     <h2>${quest.title}</h2>
@@ -108,6 +131,57 @@ function makeSheet(quest){
     ${buttons}
   `;
 }
+
+function makeLogEntry(id){
+  const record = progress[id];
+  const quest = findQuest(id);
+  let note="";
+  if(record.note !== ""){
+    note=`<p>${record.note}</p>`;
+  }
+  return `
+    <div class="card">
+      <span class="badge">${quest.emoji}</span>
+      <h3>${quest.title}</h3>
+      <p>${new Date(record.doneAt).toDateString()}</p>
+      <p>${quest.description}</p>
+      ${note}
+    </div>
+  `;
+}
+
+function showLogbook(){
+  logList.innerHTML="";
+  const doneIds = Object.keys(progress).filter(function(id){
+    return progress[id].status === "done";
+  });
+  doneIds.sort(function(a,b){
+    return progress[b].doneAt - progress[a].doneAt;
+  });
+  doneIds.forEach(function(id){
+    logList.innerHTML += makeLogEntry(id);
+  });
+  if(doneIds.length ===0){
+    emptyMessage.classList.remove("hidden");
+  } else {
+    emptyMessage.classList.add("hidden");
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 todaysQuests.addEventListener("click",function(event){
   const card = event.target.closest(".card");
@@ -130,9 +204,11 @@ sheetContent.addEventListener("click",function(event){
     progress[id] = {status:"active"};
   }
   if(action === "complete"){
-    progress[id] = {status:"done",doneAt: Date.now()};
+    const note = sheetContent.querySelector("textarea").value;
+    progress[id]={status:"done",doneAt:Date.now(),note:note};
   }
   saveProgress();
+  showLogbook();
   const quest = findQuest(id);
   sheetContent.innerHTML = makeSheet(quest);
   showTodaysQuests();
@@ -167,4 +243,5 @@ sheetContent.addEventListener("click",function(event){
 
 
 showTodaysQuests();
+showLogbook();
 showView("home");
