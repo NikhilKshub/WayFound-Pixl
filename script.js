@@ -19,6 +19,11 @@ function getStatus(id){
   }
   return progress[id].status;
 }
+function findQuest(id){
+  return allQuests.find(function(quest){
+    return quest.id === id;
+  })
+}
 
 
 
@@ -91,8 +96,7 @@ function makeSheet(quest){
   if(status ==="done"){
     buttons = `<p>You finished it.</p>`;
   } 
-  }
-
+}
   return `
     <div class="badge">${quest.emoji}</div>
     <h2>${quest.title}</h2>
@@ -109,9 +113,7 @@ todaysQuests.addEventListener("click",function(event){
   const card = event.target.closest(".card");
   if(!card) return;
   const id = card.dataset.id;
-  const quest = allQuests.find(function(quest){
-    return quest.id === id;
-  });
+  const quest = findQuest(id);
   sheetContent.innerHTML = makeSheet(quest);
   questSheet.showModal();
 })
@@ -128,15 +130,31 @@ sheetContent.addEventListener("click",function(event){
     progress[id] = {status:"active"};
   }
   if(action === "complete"){
-    progress[id] = {status:"done",date: new Date().toDateString()};
+    progress[id] = {status:"done",doneAt: Date.now()};
   }
   saveProgress();
-  const quest = allQuests.find(function(quest){
-    return quest.id === id;
-  });
+  const quest = findQuest(id);
   sheetContent.innerHTML = makeSheet(quest);
   showTodaysQuests();
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
