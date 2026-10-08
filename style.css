@@ -125,3 +125,15 @@ section {
 @media (max-width: 600px) {
   .box { padding: 1rem; }
 }
+
+dialog{
+  margin:auto;
+  background:var(--paper);
+  border:2px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  padding:2rem;
+  max-width:600px;
+}
+dialog::backdrop{background:rgba(43,42,38,0.6);}
+.card{cursor:pointer;}
+
