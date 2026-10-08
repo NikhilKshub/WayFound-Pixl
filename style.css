@@ -68,19 +68,15 @@ section {
   max-width: 1000px;
   margin: 0 auto;
 }
-
-#home > p {
-  margin-bottom: 2rem;
-}
-
-.card {
+.card, .pack{
   border: 2px solid var(--ink);
   box-shadow: 3px 3px 0 var(--ink);
   padding: 1.5rem;
   background: #F8EFD9;
+  cursor:pointer;
 }
 
-#todays-quests {
+#todays-quests, #pack-list, #pack-quests{
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.5rem;
@@ -135,5 +131,24 @@ dialog{
   max-width:600px;
 }
 dialog::backdrop{background:rgba(43,42,38,0.6);}
-.card{cursor:pointer;}
+.tag{
+  padding:0.3rem 0.5rem;
+  font-family:var(--label-font);
+}
+
+.tag.active{
+  background:var(--mustard);
+  color:var(--ink);
+}
+
+.tag.done{
+  background:var(--forest);
+  color:var(--paper);
+}
+#log-list img{max-width:100%;}
+
+.pack.selected{
+  border: 2px solid var(--tomato);
+  box-shadow: 3px 3px 0 var(--tomato);
+}
 

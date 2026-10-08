@@ -10,11 +10,10 @@ const closeSheet = document.querySelector("#close-sheet");
 const logList = document.querySelector("#log-list");
 const emptyMessage = document.querySelector("#empty-message");
 const surpriseBtn = document.querySelector("#surprise-btn");
-const packlist = document.querySelector("#pack-list");
+const packList = document.querySelector("#pack-list");
 const packQuests = document.querySelector("#pack-quests");
 let openPackId = "";
 const progress = JSON.parse(localStorage.getItem("wayfound-progress")) || {};
-
 
 
 // functions 
@@ -60,7 +59,6 @@ function makeCard(quest) {
   if(status === "done"){
     tag = `<span class="tag done">DONE</span>`;
   }
-
   return `
     <div class="card" data-id="${quest.id}">
       <span class="badge">${quest.emoji}</span>
@@ -172,6 +170,8 @@ function redraw(id){
   const quest = findQuest(id);
   sheetContent.innerHTML = makeSheet(quest);
   showTodaysQuests();
+  showPacks();
+  showPackQuests();
 }
 
 function finishQuest(id,note,photo){
@@ -216,16 +216,22 @@ function pickRandomQuest(){
   return list[index];
 }
 
-
 function questsInPack(packId){
   return allQuests.filter(function(quest){
     return quest.pack === packId;
   });
 }
 
+function showPacks(){
+  packList.innerHTML = "";
+  packs.forEach(function(pack){
+    packList.innerHTML += makePack(pack);
+  });
+}
+
 function makePack(pack){
   const quests = questsInPack(pack.id);
-  const done = quests.filter(function(quests){
+  const done = quests.filter(function(quest){
     return getStatus(quest.id) === "done";
   }).length;
   let selected = "";
@@ -234,7 +240,7 @@ function makePack(pack){
   }
   return `
     <div class="pack${selected}" data-id="${pack.id}">
-      <span class="badge">${pack.emoji}</span>
+      <span class="badge">${pack.coverEmoji}</span>
       <h3>${pack.name}</h3>
       <p>${pack.description}</p>
       <span>${done} of ${quests.length} done</span>
@@ -242,20 +248,16 @@ function makePack(pack){
   `;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function showPackQuests(){
+  packQuests.innerHTML ="";
+  if(openPackId === ""){
+    packQuests.innerHTML = "<p>Pick a pack to see its quests</p>";
+    return;
+  }
+  questsInPack(openPackId).forEach(function(quest){
+    packQuests.innerHTML += makeCard(quest);
+  });
+}
 
 // Listeners 
 
@@ -263,14 +265,23 @@ surpriseBtn.addEventListener("click",function(){
   openSheet(pickRandomQuest());
 });
 
-todaysQuests.addEventListener("click",function(event){
+packList.addEventListener("click",function(event){
+  const pack =event.target.closest(".pack");
+  if(!pack) return;
+  openPackId = pack.dataset.id;
+  showPacks();
+  showPackQuests();
+});
+
+function openFromCard(event){
   const card = event.target.closest(".card");
   if(!card) return;
   const id = card.dataset.id;
   const quest = findQuest(id);
   openSheet(quest);
-})
-
+}
+todaysQuests.addEventListener("click",openFromCard);
+packQuests.addEventListener("click",openFromCard);
 closeSheet.addEventListener("click",function(){
   questSheet.close();
 });
@@ -279,13 +290,11 @@ sheetContent.addEventListener("click",function(event){
   const action = event.target.dataset.action;
   if(!action) return;
   const id = event.target.dataset.id;
-
   if(action === "accept"){
     progress[id] = {status:"active"};
     saveProgress();
     redraw(id);
   }
-
   if(action === "complete"){
     const note = sheetContent.querySelector("textarea").value;
     const input = sheetContent.querySelector("input");
@@ -301,33 +310,9 @@ sheetContent.addEventListener("click",function(event){
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 showTodaysQuests();
 showLogbook();
+showPacks();
+showPackQuests();
 showView("home");
+
