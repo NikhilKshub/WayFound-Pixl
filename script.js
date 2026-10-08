@@ -101,7 +101,7 @@ function makeSheet(quest){
     buttons =`
       <textarea placeholder="How did it really go? Optional."></textarea>
       <label>Photo is optional</label>
-      <input type="file" accept="image/*"
+      <input type="file" accept="image/*">
       <button data-action="complete" data-id="${quest.id}">Mark as done</button>
     `;
   }
@@ -161,14 +161,17 @@ function showLogbook(){
   }
 }
 
-
-function finishQuest(id,note,photo){
-  progress[id]={status:"done",doneAt:Date.now(),note:note,photo:photo};
-  saveProgress();
+function redraw(id){
   showLogbook();
   const quest = findQuest(id);
   sheetContent.innerHTML = makeSheet(quest);
   showTodaysQuests();
+}
+
+function finishQuest(id,note,photo){
+  progress[id]={status:"done",doneAt:Date.now(),note:note,photo:photo};
+  saveProgress();
+  redraw(id);
 }
 
 function shrinkPhoto(file, whenDone){
@@ -184,7 +187,7 @@ function shrinkPhoto(file, whenDone){
       canvas.width = width;
       canvas.height = height;
       canvas.getContext("2d").drawImage(img, 0, 0, width, height);
-      whenDone(canvas.toDataURL("image.jpeg", 0.7));
+      whenDone(canvas.toDataURL("image/jpeg", 0.7));
     };
   };
   reader.readAsDataURL(file);
@@ -219,9 +222,13 @@ sheetContent.addEventListener("click",function(event){
   const action = event.target.dataset.action;
   if(!action) return;
   const id = event.target.dataset.id;
+
   if(action === "accept"){
     progress[id] = {status:"active"};
+    saveProgress();
+    redraw(id);
   }
+
   if(action === "complete"){
     const note = sheetContent.querySelector("textarea").value;
     const input = sheetContent.querySelector("input");
