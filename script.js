@@ -55,25 +55,35 @@ function showView(name) {
   });
 }
 
+navButtons.forEach(function(button){
+  if(button.dataset.view === name){
+    button.classList.add("current");
+  } else {
+    button.classList.remove("current");
+  }
+});
+
 function makeCard(quest) {
   const filled = "●".repeat(quest.difficulty);
   const empty = "○".repeat(5 - quest.difficulty);
   const status = getStatus(quest.id);
-  let tag ="";
-  if(status === "active"){
+  let tag = "";
+  if (status === "active") {
     tag = `<span class="tag active">IN PROGRESS</span>`;
   }
-  if(status === "done"){
+  if (status === "done") {
     tag = `<span class="tag done">DONE</span>`;
   }
   return `
-    <div class="card" data-id="${quest.id}">
+    <div class="card" data-id="${quest.id}" data-pack="${quest.pack}">
+      ${tag}
       <span class="badge">${quest.emoji}</span>
       <h3>${quest.title}</h3>
       <p>${quest.description}</p>
-      ${tag}
-      <span class="duration">${quest.duration}</span>
-      <span class="difficulty">${filled}${empty}</span>
+      <div class="card-footer">
+        <span class="duration">${quest.duration}</span>
+        <span class="difficulty">${filled}${empty}</span>
+      </div>
     </div>
   `;
 }
@@ -92,48 +102,64 @@ navButtons.forEach(function(button) {
   });
 });
 
-
 function makeSheet(quest){
-  let objectives ="";
+  const pack = findPack(quest.pack);
+  let objectives = "";
   quest.objectives.forEach(function(objective){
     objectives += `<li>${objective}</li>`;
   });
-  let tip ="";
+  let tip = "";
   if(quest.tip){
-    tip = `<p>${quest.tip}</p>`;
+    tip = `
+      <p><span class="label">Tip</span> ${quest.tip}</p>
+    `;
   }
-
   const status = getStatus(quest.id);
-  let buttons="";
+  let buttons = "";
   if(status === "new"){
     buttons = `<button data-action="accept" data-id="${quest.id}">Accept quest</button>`;
   }
-  if(status ==="active"){
-    buttons =`
+  if(status === "active"){
+    buttons = `
+      <label>How did it go?</label>
       <textarea placeholder="How did it really go? Optional."></textarea>
       <label>Photo is optional</label>
       <input type="file" accept="image/*">
       <button data-action="complete" data-id="${quest.id}">Mark as done</button>
     `;
   }
-  if(status ==="done"){
-    buttons = `<p>You finished it.</p>`;
-  } 
+  if(status === "done"){
+    const doneDate = new Date(progress[quest.id].doneAt).toDateString();
+    buttons = `<p class="done-stamp">DONE · ${doneDate}</p>`;
+  }
   return `
-    <div class="badge">${quest.emoji}</div>
-    <h2>${quest.title}</h2>
-    <p>${quest.description}</p>
-    <h3>What to do</h3>
-    <ul>${objectives}</ul>
-    <p>You'll walk away with ${quest.reward}</p>
-    ${tip}
-    ${buttons}
+    <div data-pack="${quest.pack}">
+      <div class="sheet-head">
+        <div class="badge">${quest.emoji}</div>
+        <p class="label">${pack.name}</p>
+        <h2>${quest.title}</h2>
+        <p>${quest.description}</p>
+      </div>
+      <div class="sheet-todo">
+        <p class="label">What to do</p>
+        <ul>${objectives}</ul>
+      </div>
+      <div class="sheet-reward">
+        <p class="label">You'll walk away with</p>
+        <p class="reward-text">${quest.reward}</p>
+        ${tip}
+      </div>
+      <div class="sheet-action">
+        ${buttons}
+      </div>
+    </div>
   `;
 }
 
 function makeLogEntry(id){
   const record = progress[id];
   const quest = findQuest(id);
+  const pack = findPack(quest.pack);
   let note="";
   if(record.note !== ""){
     note=`<p>${record.note}</p>`;
@@ -143,10 +169,13 @@ function makeLogEntry(id){
     photo=`<img src="${record.photo}" alt="Quest photo">`;
   }
   return `
-    <div class="card">
-      <span class="badge">${quest.emoji}</span>
+    <div class="log-entry" data-pack="${quest.pack}">
+      <div class="log-entry-top">
+        <span class="badge">${quest.emoji}</span>
+        <span class="pack-name">${pack.name}</span>
+      </div>
       <h3>${quest.title}</h3>
-      <p>${new Date(record.doneAt).toDateString()}</p>
+      <p class="log-date">${new Date(record.doneAt).toDateString()}</p>
       <p>${quest.description}</p>
       ${note}
       ${photo}
@@ -246,7 +275,7 @@ function makePack(pack){
     selected = " selected";
   }
   return `
-    <div class="pack${selected}" data-id="${pack.id}">
+    <div class="pack${selected}" data-id="${pack.id}" data-pack="${pack.id}">
       <span class="badge">${pack.coverEmoji}</span>
       <h3>${pack.name}</h3>
       <span>${done} of ${quests.length} done</span>
