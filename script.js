@@ -53,15 +53,14 @@ function showView(name) {
       section.classList.add("hidden");
     }
   });
+  navButtons.forEach(function(button) {
+    if (button.dataset.view === name) {
+      button.classList.add("current");
+    } else {
+      button.classList.remove("current");
+    }
+  });
 }
-
-navButtons.forEach(function(button){
-  if(button.dataset.view === name){
-    button.classList.add("current");
-  } else {
-    button.classList.remove("current");
-  }
-});
 
 function makeCard(quest) {
   const filled = "●".repeat(quest.difficulty);
@@ -110,9 +109,7 @@ function makeSheet(quest){
   });
   let tip = "";
   if(quest.tip){
-    tip = `
-      <p><span class="label">Tip</span> ${quest.tip}</p>
-    `;
+    tip = `<p class="tip"><span class="label">Tip</span> ${quest.tip}</p>`;
   }
   const status = getStatus(quest.id);
   let buttons = "";
@@ -138,7 +135,7 @@ function makeSheet(quest){
         <div class="badge">${quest.emoji}</div>
         <p class="label">${pack.name}</p>
         <h2>${quest.title}</h2>
-        <p>${quest.description}</p>
+        <p class="lead">${quest.description}</p>
       </div>
       <div class="sheet-todo">
         <p class="label">What to do</p>
